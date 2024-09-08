@@ -1,6 +1,6 @@
 [package]
 name = "gdman"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
 
 [dependencies]
@@ -21,4 +21,3 @@ strum_macros = "0.26.4"
 symlink = "0.1.0"
 tokio = { version = "1.39.3", features = ["full"] }
 tokio-util = "0.7.12"
-zip-extensions = "0.8.1"
