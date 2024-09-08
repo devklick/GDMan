@@ -1,0 +1,24 @@
+[package]
+name = "gdman"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async_zip = { version = "0.0.17", features = ["deflate", "tokio", "tokio-fs"] }
+chrono = { version = "0.4.38", features = ["serde"] }
+clap = { version = "4.5.16", features = ["derive"] }
+fern = { version = "0.6.2", features = ["colored"] }
+futures-lite = "2.3.0"
+indicatif = "0.17.8"
+log = "0.4.22"
+regex = "1.10.6"
+reqwest = { version = "0.12.7", features = ["json"] }
+semver = "1.0.23"
+serde = { version = "1.0.208", features = ["derive"] }
+stderrlog = "0.6.0"
+strum = "0.26.3"
+strum_macros = "0.26.4"
+symlink = "0.1.0"
+tokio = { version = "1.39.3", features = ["full"] }
+tokio-util = "0.7.12"
+zip-extensions = "0.8.1"

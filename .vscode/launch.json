@@ -1,0 +1,312 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // ======== INSTALL ========
+    {
+      "name": "Install Godot_v4.2.1-stable_linux.x86_64",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": {
+          "name": "gdman",
+          "kind": "bin"
+        }
+      },
+      /* prettier-ignore */
+      "args": [
+        "install", "-v", "4.2.1", "-p", "linux", "-a", "x64", "-f", "standard",
+      ]
+    },
+    {
+      "name": "Install Godot_v4.2.1-stable_mono_linux_x86_64",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": {
+          "name": "gdman",
+          "kind": "bin"
+        }
+      },
+      /* prettier-ignore */
+      "args": [
+        "install", "-v", "4.2.1", "-p", "linux", "-a", "x64", "-f", "standard",
+      ]
+    },
+    {
+      "name": "Install Godot_v4.2.1-stable_linux.x86_32",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": {
+          "name": "gdman",
+          "kind": "bin"
+        }
+      },
+      /* prettier-ignore */
+      "args": [
+        "install", "-v", "4.2.1", "-p", "linux", "-a", "x86", "-f", "standard",
+      ]
+    },
+    {
+      "name": "Install Godot_v4.2.1-stable_linux.x86_32",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": {
+          "name": "gdman",
+          "kind": "bin"
+        }
+      },
+      /* prettier-ignore */
+      "args": [
+        "install", "-v", "4.2.1", "-p", "linux", "-a", "x86", "-f", "mono",
+      ]
+    },
+    {
+      "name": "Install Godot_v4.2.1-stable_win64.exe",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "install", "-v", "4.2.1", "-p", "windows", "-a", "x64", "-f", "standard",
+      ]
+    },
+    {
+      "name": "Install Godot_v4.2.1-stable_mono_win64",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "install", "-v", "4.2.1", "-p", "windows", "-a", "x64", "-f", "mono",
+      ]
+    },
+    {
+      "name": "Install Godot_v4.2.1-stable_win32.exe",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "install", "-v", "4.2.1", "-p", "windows", "-a", "x86", "-f", "standard",
+      ]
+    },
+    {
+      "name": "Install Godot_v4.2.1-stable_mono_win32",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "install", "-v", "4.2.1", "-p", "windows", "-a", "x86", "-f", "mono",
+      ]
+    },
+    {
+      "name": "Install Godot_v4.2.1-stable_macos.universal",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "install", "-v", "4.2.1", "-p", "macos", "-f", "standard",
+      ]
+    },
+    {
+      "name": "Install Godot_v4.2.1-stable_mono_macos.universal",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "install", "-v", "4.2.1", "-p", "macos", "-f", "mono",
+      ]
+    },
+
+    // ======== UNINSTALL ========
+    {
+      "name": "Uninstall Godot_v4.2.1-stable_linux.x86_64",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": {
+          "name": "gdman",
+          "kind": "bin"
+        }
+      },
+      /* prettier-ignore */
+      "args": [
+        "uninstall", "-v", "4.2.1", "-p", "linux", "-a", "x64", "-f", "standard",
+      ]
+    },
+    {
+      "name": "Uninstall Godot_v4.2.1-stable_mono_linux_x86_64",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": {
+          "name": "gdman",
+          "kind": "bin"
+        }
+      },
+      /* prettier-ignore */
+      "args": [
+        "uninstall", "-v", "4.2.1", "-p", "linux", "-a", "x64", "-f", "standard",
+      ]
+    },
+    {
+      "name": "Uninstall Godot_v4.2.1-stable_linux.x86_32",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": {
+          "name": "gdman",
+          "kind": "bin"
+        }
+      },
+      /* prettier-ignore */
+      "args": [
+        "uninstall", "-v", "4.2.1", "-p", "linux", "-a", "x86", "-f", "standard",
+      ]
+    },
+    {
+      "name": "Uninstall Godot_v4.2.1-stable_linux.x86_32",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": {
+          "name": "gdman",
+          "kind": "bin"
+        }
+      },
+      /* prettier-ignore */
+      "args": [
+        "uninstall", "-v", "4.2.1", "-p", "linux", "-a", "x86", "-f", "mono",
+      ]
+    },
+    {
+      "name": "Uninstall Godot_v4.2.1-stable_win64.exe",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "uninstall", "-v", "4.2.1", "-p", "windows", "-a", "x64", "-f", "standard",
+      ]
+    },
+    {
+      "name": "Uninstall Godot_v4.2.1-stable_mono_win64",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "uninstall", "-v", "4.2.1", "-p", "windows", "-a", "x64", "-f", "mono",
+      ]
+    },
+    {
+      "name": "Uninstall Godot_v4.2.1-stable_win32.exe",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "uninstall", "-v", "4.2.1", "-p", "windows", "-a", "x86", "-f", "standard",
+      ]
+    },
+    {
+      "name": "Uninstall Godot_v4.2.1-stable_mono_win32",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "uninstall", "-v", "4.2.1", "-p", "windows", "-a", "x86", "-f", "mono",
+      ]
+    },
+    {
+      "name": "Uninstall Godot_v4.2.1-stable_macos.universal",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "uninstall", "-v", "4.2.1", "-p", "macos", "-f", "standard",
+      ]
+    },
+    {
+      "name": "Uninstall Godot_v4.2.1-stable_mono_macos.universal",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "uninstall", "-v", "4.2.1", "-p", "macos", "-f", "mono",
+      ]
+    }
+  ]
+}
