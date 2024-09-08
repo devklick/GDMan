@@ -21,9 +21,15 @@ serde = { version = "1.0.210", features = ["derive"] }
 stderrlog = "0.6.0"
 strum = "0.26.3"
 strum_macros = "0.26.4"
-symlink = "0.1.0"
 tokio = { version = "1.40.0", features = ["full"] }
 tokio-util = "0.7.12"
+
+[target.'cfg(windows)'.dependencies]
+mslnk = "0.1.8"
+
+[target.'cfg(unix)'.dependencies]
+symlink = "0.1.0"
+openssl = { version = "0.10.59", features = ["vendored"] }
 
 # The profile that 'cargo dist' will build with
 [profile.dist]

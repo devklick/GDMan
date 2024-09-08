@@ -23,16 +23,7 @@ pub fn set_active_godot_version(version_name: &str) -> Result<(), String> {
 
     let link_path: PathBuf = get_godot_link_path()?;
 
-    // if the link exists, delete it
-    match fs::symlink_metadata(&link_path) {
-        Ok(_) => {
-            log::trace!("Removing old godot link {}", link_path.display());
-            if let Err(e) = fs::remove_file(&link_path) {
-                return Err(e.to_string().to_owned());
-            }
-        }
-        Err(_) => (),
-    }
+    remove_link(&link_path)?;
 
     let version_dir_path = get_versions_dir()?;
     let target_version_dir = version_dir_path.join(version_name);
@@ -48,13 +39,54 @@ pub fn set_active_godot_version(version_name: &str) -> Result<(), String> {
 
     log::trace!("Linking godot command to {}", target_exe_path.display());
 
-    return match symlink::symlink_file(target_exe_path, link_path) {
-        Err(e) => Err(e.to_string()),
-        _ => {
-            log::info!("Set {version_name} active");
-            return Ok(());
+    create_link(&link_path, &target_exe_path)?;
+
+    log::info!("Set {version_name} active");
+
+    return Ok(());
+}
+
+#[cfg(windows)]
+fn create_link(link_path: &PathBuf, target_path: &PathBuf) -> Result<(), String> {
+    let sl = mslnk::ShellLink::new(target_path).or(Err("Failed to create ShellLink"))?;
+    sl.create_lnk(link_path)
+        .or(Err("Failed to create Godot shortcut"))?;
+
+    return Ok(());
+}
+
+#[cfg(unix)]
+fn create_link(link_path: &PathBuf, target_path: &PathBuf) -> Result<(), String> {
+    if let Err(err) = symlink::symlink_file(target_path, link_path) {
+        return Err(format!(
+            "Failed to create Godot symlink,\n{}",
+            err.to_string()
+        ));
+    }
+    return Ok(());
+}
+
+#[cfg(windows)]
+fn remove_link(link_path: &PathBuf) -> Result<(), String> {
+    if link_path.is_file() {
+        log::trace!("Removing old godot link {}", link_path.display());
+        fs::remove_file(link_path).or(Err("Error deleting Windows Godot shortcut"))?;
+    }
+    return Ok(());
+}
+
+#[cfg(unix)]
+fn remove_link(link_path: &PathBuf) -> Result<(), String> {
+    match fs::symlink_metadata(&link_path) {
+        Ok(_) => {
+            log::trace!("Removing old godot link {}", link_path.display());
+            if let Err(e) = fs::remove_file(&link_path) {
+                return Err(e.to_string().to_owned());
+            }
         }
-    };
+        Err(_) => {}
+    }
+    return Ok(());
 }
 
 pub fn already_installed(version_name: &str) -> bool {

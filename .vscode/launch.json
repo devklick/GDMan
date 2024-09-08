@@ -1,6 +1,23 @@
 {
   "version": "0.2.0",
   "configurations": [
+    {
+      "name": "Debug",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": {
+          "name": "gdman",
+          "kind": "bin"
+        }
+      },
+      /* prettier-ignore */
+      "args": [
+        "install", "-l", "-f", "mono"
+      ]
+    },
     // ======== INSTALL ========
     {
       "name": "Install Godot_v4.2.1-stable_linux.x86_64",
