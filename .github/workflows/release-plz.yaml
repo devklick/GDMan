@@ -4,7 +4,7 @@ permissions:
   pull-requests: write
   contents: write
 
-on:
+on: 
   push:
     branches:
       - dev # TODO: eventually move to main/master
