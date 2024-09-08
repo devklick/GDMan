@@ -7,7 +7,7 @@ permissions:
 on:
   push:
     branches:
-      - main
+      - dev
 jobs:
   release-plz:
     name: Release-plz
