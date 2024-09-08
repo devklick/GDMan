@@ -3,3 +3,7 @@
 changelog_config = "cliff.toml"
 # disable `cargo publish`
 publish = false
+#disable GitHub/Gitea releases
+git_release_enable = false
+#creates a git tag for the new package version
+git_tag_enable = true

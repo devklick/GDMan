@@ -7,7 +7,7 @@ permissions:
 on:
   push:
     branches:
-      - dev
+      - dev # TODO: eventually move to main/master
 jobs:
   release-plz:
     name: Release-plz
