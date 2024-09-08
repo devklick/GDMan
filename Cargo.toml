@@ -4,7 +4,7 @@ version = "0.0.1"
 edition = "2021"
 repository = "https://github.com/devklick/gdman-rs"
 description = "A CLI application for managing versions of Godot"
-license = "MIT License"
+license = "MIT"
 
 [dependencies]
 async_zip = { version = "0.0.17", features = ["deflate", "tokio", "tokio-fs"] }
