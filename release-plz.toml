@@ -1,3 +1,5 @@
 [workspace]
 # path of the git-cliff configuration
 changelog_config = "cliff.toml"
+# disable `cargo publish`
+publish = false
