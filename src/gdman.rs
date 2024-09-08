@@ -344,7 +344,7 @@ pub fn get_current_version() -> Result<GodotVersionInfo, String> {
 
 fn get_godot_link_path() -> Result<PathBuf, String> {
     let link_name = match env::consts::OS {
-        "windows" => "godot.exe",
+        "windows" => "godot.lnk",
         _ => "godot",
     };
 
