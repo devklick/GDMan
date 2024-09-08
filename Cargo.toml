@@ -24,6 +24,7 @@ strum_macros = "0.26.4"
 symlink = "0.1.0"
 tokio = { version = "1.40.0", features = ["full"] }
 tokio-util = "0.7.12"
+openssl = { version = "0.10.59", features = ["vendored"] }
 
 # The profile that 'cargo dist' will build with
 [profile.dist]
