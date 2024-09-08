@@ -80,6 +80,8 @@ impl RunCommand for InstallVersionCommand {
 
         gdman::download_godot_version(version_name, &client, &asset.browser_download_url).await?;
 
+        gdman::set_active_godot_version(&version_name)?;
+
         return Ok(());
     }
 }
