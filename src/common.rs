@@ -47,10 +47,20 @@ pub enum Architecture {
 
 impl FromOS<Architecture> for Architecture {
     fn from_os() -> Result<Architecture, String> {
+        #[cfg(target_os = "macos")]
+        if Platform::from_os().unwrap() == Platform::MacOS {
+            return Ok(Architecture::Universal);
+        }
+
         // TODO: This is probably way off, but it's a starting point
         match env::consts::ARCH {
+            #[cfg(unix)]
             "arm" => Ok(Architecture::Arm32),
+            #[cfg(unix)]
+            "aarch64" => Ok(Architecture::Arm64),
+            #[cfg(any(unix, windows))]
             "x86" => Ok(Architecture::X86),
+            #[cfg(any(unix, windows))]
             "x86_64" => Ok(Architecture::X64),
             _ => Err("Unsupported architecture".to_owned()),
         }
