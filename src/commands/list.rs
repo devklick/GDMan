@@ -8,9 +8,15 @@ pub struct ListVersionsCommand {}
 
 impl RunCommand for ListVersionsCommand {
     async fn run(self) -> Result<(), String> {
-        gdman::get_installed_versions()?
-            .iter()
-            .for_each(|version| log::info!("{}", version.name_parts.version_name));
+        let versions = gdman::get_installed_versions()?;
+
+        if versions.len() == 0 {
+            log::info!("No versions installed");
+        } else {
+            for version in versions {
+                log::info!("{}", version.name_parts.version_name);
+            }
+        }
 
         return Ok(());
     }
