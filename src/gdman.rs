@@ -89,6 +89,22 @@ fn remove_link(link_path: &PathBuf) -> Result<(), String> {
     return Ok(());
 }
 
+#[cfg(unix)]
+fn get_link_target(link_path: &PathBuf) -> Result<PathBuf, String> {
+    return match fs::read_link(link_path) {
+        Err(e) => Err(format!(
+            "Cant determine current version, godot link may be broken\n{e}"
+        )),
+        Ok(target) => {
+            log::trace!("Godot link points to {}", target.display());
+            return Ok(target);
+        }
+    };
+}
+
+#[cfg(windows)]
+fn get_link_target(link_path: &PathBuf) -> Result<PathBuf, String> {}
+
 pub fn already_installed(version_name: &str) -> bool {
     let mut dir_path = match get_versions_dir() {
         Err(_) => return false,
@@ -288,6 +304,13 @@ pub fn get_installed_versions() -> Result<Vec<GodotVersionInfo>, String> {
     };
 
     return Ok(entries
+        .filter(|e| {
+            e.as_ref()
+                .unwrap()
+                .file_name()
+                .to_string_lossy()
+                .starts_with("Godot_")
+        })
         .filter_map(|entry| {
             entry.ok().and_then(|e| {
                 Some(GodotVersionInfo {
@@ -318,28 +341,40 @@ pub fn get_current_version() -> Result<GodotVersionInfo, String> {
         .to_owned());
     }
 
-    return match fs::read_link(path) {
-        Err(e) => Err(format!(
-            "Cant determine current version, godot link may be broken\n{e}"
-        )),
-        Ok(target) => {
-            log::trace!("Godot link points to {}", target.display());
-            let version_name = target.file_name().unwrap();
-            let current_info = GodotVersionInfo {
-                path: target.clone(),
-                name_parts: gd::parse_version_name(version_name.to_str().unwrap())?,
-            };
-            log::trace!(
-                "Found active version of Godot to be {}, (platform = {}, architecture = {}, flavour = {})",
-                current_info.name_parts.version.to_string(),
-                current_info.name_parts.platform,
-                current_info.name_parts.architecture,
-                current_info.name_parts.flavour
-            );
+    let target = get_link_target(&path)?;
 
-            return Ok(current_info);
-        }
+    let version_dir = get_version_dir_from_exe_path(&target)?;
+
+    log::trace!("Found version directory {}", version_dir.display());
+
+    let version_name = version_dir.file_name().unwrap();
+
+    let current_info = GodotVersionInfo {
+        path: version_dir.clone(),
+        name_parts: gd::parse_version_name(version_name.to_str().unwrap())?,
     };
+
+    log::trace!(
+        "Found active version of Godot to be {}, (platform = {}, architecture = {}, flavour = {})",
+        current_info.name_parts.version.to_string(),
+        current_info.name_parts.platform,
+        current_info.name_parts.architecture,
+        current_info.name_parts.flavour
+    );
+
+    return Ok(current_info);
+}
+
+#[cfg(any(windows, target_os = "linux"))]
+fn get_version_dir_from_exe_path(exe_path: &PathBuf) -> Result<PathBuf, String> {
+    return Ok(exe_path.parent().unwrap().to_path_buf());
+}
+
+#[cfg(target_os = "macos")]
+fn get_version_dir_from_exe_path(exe_path: &PathBuf) -> Result<PathBuf, String> {
+    // exe_path will be something like Godot_v1.2.3/Godot/Contents/MacOS/Godot
+    // We need to backtrack 4 parents to get the version dir
+    return Ok(exe_path.ancestors().nth(4).unwrap().to_path_buf());
 }
 
 fn get_godot_link_path() -> Result<PathBuf, String> {
