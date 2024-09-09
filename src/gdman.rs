@@ -9,6 +9,7 @@ use std::{
     env,
     fs::{self, remove_file, DirEntry},
     path::{Path, PathBuf},
+    str::FromStr,
 };
 
 use async_zip::tokio::read::seek::ZipFileReader;
@@ -103,7 +104,14 @@ fn get_link_target(link_path: &PathBuf) -> Result<PathBuf, String> {
 }
 
 #[cfg(windows)]
-fn get_link_target(link_path: &PathBuf) -> Result<PathBuf, String> {}
+fn get_link_target(link_path: &PathBuf) -> Result<PathBuf, String> {
+    let target = lnk::ShellLink::open(link_path).unwrap();
+    log::trace!("Found lnk data {:#?}", target);
+    return match target.relative_path() {
+        Some(r) => Ok(PathBuf::from_str(r).or(Err("Invalid path in shortcut"))?),
+        None => Err("Error following shortcut".to_owned()),
+    };
+}
 
 pub fn already_installed(version_name: &str) -> bool {
     let mut dir_path = match get_versions_dir() {
