@@ -453,7 +453,7 @@ dependencies = [
 
 [[package]]
 name = "gdman"
-version = "0.0.6"
+version = "0.0.7"
 dependencies = [
  "async_zip",
  "chrono",
