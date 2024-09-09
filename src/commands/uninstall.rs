@@ -4,7 +4,7 @@ use clap::Parser;
 
 use crate::{
     clap_enum_variants,
-    common::{Architecture, Flavour, Platform},
+    common::{Architecture, Flavour},
     gd_semver::MaybeVersionOrVersionReq,
     gdman::{self, GodotVersionInfo},
 };
@@ -15,9 +15,6 @@ use super::common::RunCommand;
 pub struct UninstallVersionsCommand {
     #[arg(short, long, help = "Specifies the version(s) to uninstall", value_parser=MaybeVersionOrVersionReq::from_str, group = "version_filter")]
     version: Option<MaybeVersionOrVersionReq>,
-
-    #[arg(short, long, help = "Specifies the target platform of the version to uninstall", value_enum, value_parser=clap_enum_variants!(Platform))]
-    platform: Option<Platform>,
 
     #[arg(short, long, help = "Specifies the target architecture version to uninstall", value_enum,  value_parser=clap_enum_variants!(Architecture))]
     architecture: Option<Architecture>,
@@ -67,11 +64,6 @@ impl RunCommand for UninstallVersionsCommand {
                     if !v.version_like.matches(&version.name_parts.version) {
                         continue;
                     }
-                }
-            }
-            if let Some(platform) = &self.platform {
-                if platform != &version.name_parts.platform {
-                    continue;
                 }
             }
             if let Some(architecture) = &self.architecture {

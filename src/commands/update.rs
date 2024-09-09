@@ -94,6 +94,6 @@ impl RunCommand for UpdateVersionCommand {
 
         gdman::set_active_godot_version(version_name)?;
 
-        return Err("Not yet implemented".to_owned());
+        return Ok(());
     }
 }
