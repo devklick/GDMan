@@ -107,10 +107,20 @@ fn get_link_target(link_path: &PathBuf) -> Result<PathBuf, String> {
 fn get_link_target(link_path: &PathBuf) -> Result<PathBuf, String> {
     let target = lnk::ShellLink::open(link_path).unwrap();
     log::trace!("Found lnk data {:#?}", target);
-    return match target.relative_path() {
-        Some(r) => Ok(PathBuf::from_str(r).or(Err("Invalid path in shortcut"))?),
-        None => Err("Error following shortcut".to_owned()),
-    };
+
+    let working_dir = target
+        .working_dir()
+        .as_ref()
+        .expect("Godot shortcut has no working directory");
+
+    let relative_path = target
+        .relative_path()
+        .as_ref()
+        .expect("Godot shortcut has no relative path");
+
+    let target_path = PathBuf::from_iter([working_dir, relative_path]);
+
+    return Ok(target_path);
 }
 
 pub fn already_installed(version_name: &str) -> bool {
