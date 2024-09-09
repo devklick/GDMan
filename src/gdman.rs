@@ -305,7 +305,7 @@ pub fn get_installed_versions() -> Result<Vec<GodotVersionInfo>, String> {
 
     return Ok(entries
         .filter(|e| {
-            !e.as_ref()
+            e.as_ref()
                 .unwrap()
                 .file_name()
                 .to_string_lossy()
