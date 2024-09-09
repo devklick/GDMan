@@ -33,9 +33,6 @@ pub struct InstallVersionCommand {
     #[command(flatten)]
     version_or_latest: VersionOrLatest,
 
-    #[arg(short, long, help = "Specifies the target platform", value_enum, default_value_t=Platform::from_os().unwrap(), value_parser=clap_enum_variants!(Platform))]
-    platform: Platform,
-
     #[arg(short, long, help = "Specifies the target architecture", value_enum, default_value_t=Architecture::from_os().unwrap(), value_parser=clap_enum_variants!(Architecture))]
     architecture: Architecture,
 
@@ -45,13 +42,15 @@ pub struct InstallVersionCommand {
 
 impl RunCommand for InstallVersionCommand {
     async fn run(self) -> Result<(), String> {
+        let platform = Platform::from_os()?;
+
         let (version_input, version_like, version_exact) =
             flatten_version(&self.version_or_latest.version);
 
         if let Some(_) = version_exact {
             if gdman::activate_by_parts_if_installed(
                 &version_input,
-                &self.platform,
+                &platform,
                 &self.architecture,
                 &self.flavour,
             )? {
@@ -64,7 +63,7 @@ impl RunCommand for InstallVersionCommand {
         let release = gd::find_release_with_asset(
             &version_exact,
             &version_like,
-            &self.platform,
+            &platform,
             &self.architecture,
             &self.flavour,
             &client,

@@ -131,7 +131,9 @@ fn parse_architecture_from_version_name(
     platform: &Platform,
 ) -> Result<Architecture, String> {
     match platform {
+        #[cfg(target_os = "macos")]
         Platform::MacOS => return Ok(Architecture::Universal),
+        #[cfg(windows)]
         Platform::Windows => {
             if version_name.contains("win32") {
                 return Ok(Architecture::X86);
@@ -141,6 +143,7 @@ fn parse_architecture_from_version_name(
             }
             return Err("Invalid version name".to_owned());
         }
+        #[cfg(target_os = "linux")]
         Platform::Linux => {
             if version_name.contains("arm32") {
                 return Ok(Architecture::Arm32);
@@ -156,6 +159,7 @@ fn parse_architecture_from_version_name(
             }
             return Err("Invalid version name".to_owned());
         }
+        _ => return Err(format!("Invalid platform {platform}")),
     }
 }
 
@@ -187,23 +191,19 @@ fn generate_asset_name(
     }
 
     match platform {
+        #[cfg(windows)]
         Platform::Windows => {
             parts.push("win");
 
             match architecture {
                 Architecture::X64 => parts.push("64"),
                 Architecture::X86 => parts.push("32"),
-                _ => {
-                    return Err(format!(
-                        "Architecture {architecture} not supported on {platform} platform"
-                    )
-                    .to_owned())
-                }
             }
             if *flavour != Flavour::Mono {
                 parts.push(".exe");
             }
         }
+        #[cfg(target_os = "linux")]
         Platform::Linux => {
             parts.push("linux");
 
@@ -216,17 +216,13 @@ fn generate_asset_name(
                 Architecture::Arm64 => parts.push("arm64"),
                 Architecture::X64 => parts.push("x86_64"),
                 Architecture::X86 => parts.push("x86_32"),
-                _ => {
-                    return Err(format!(
-                        "Architecture {architecture} not supported on {platform} platform"
-                    )
-                    .to_owned())
-                }
             }
         }
+        #[cfg(target_os = "macos")]
         Platform::MacOS => {
             parts.push("macos.universal");
         }
+        _ => return Err(format!("Invalid platform {platform}")),
     }
 
     return Ok(parts.join(""));

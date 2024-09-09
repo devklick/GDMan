@@ -5,8 +5,7 @@ pub trait FromOS<T> {
     fn from_os() -> Result<T, String>;
 }
 
-#[derive(EnumString, VariantNames, clap::ValueEnum, Clone, Debug, PartialEq, Display)]
-#[strum(serialize_all = "lowercase")]
+#[derive(Clone, Debug, PartialEq, Display)]
 pub enum Platform {
     Windows,
     Linux,
@@ -19,7 +18,7 @@ impl FromOS<Platform> for Platform {
             "linux" => Ok(Platform::Linux),
             "windows" => Ok(Platform::Windows),
             "macos" => Ok(Platform::MacOS),
-            _ => Err("Unsupported platform".to_owned()),
+            _ => Err(format!("Unsupported platform {}", env::consts::OS)),
         }
     }
 }
@@ -34,10 +33,15 @@ pub enum Flavour {
 #[derive(EnumString, VariantNames, clap::ValueEnum, Clone, Debug, PartialEq, Display)]
 #[strum(serialize_all = "lowercase")]
 pub enum Architecture {
+    #[cfg(unix)]
     Arm32,
+    #[cfg(unix)]
     Arm64,
+    #[cfg(any(unix, windows))]
     X86,
+    #[cfg(any(unix, windows))]
     X64,
+    #[cfg(target_os = "macos")]
     Universal,
 }
 
