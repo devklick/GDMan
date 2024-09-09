@@ -116,7 +116,7 @@ fn get_link_target(link_path: &PathBuf) -> Result<PathBuf, String> {
     let relative_path = target
         .relative_path()
         .as_ref()
-        .expect("Godot shortcut has no relative directory");
+        .expect("Godot shortcut has no relative path");
 
     let target_path = PathBuf::from_iter([working_dir, relative_path]);
 
