@@ -9,7 +9,6 @@ use std::{
     env,
     fs::{self, remove_file, DirEntry},
     path::{Path, PathBuf},
-    str::FromStr,
 };
 
 use async_zip::tokio::read::seek::ZipFileReader;
@@ -368,7 +367,7 @@ pub fn get_current_version() -> Result<GodotVersionInfo, String> {
     let version_name = version_dir.file_name().unwrap();
 
     let current_info = GodotVersionInfo {
-        path: version_dir.clone(),
+        path: target,
         name_parts: gd::parse_version_name(version_name.to_str().unwrap())?,
     };
 

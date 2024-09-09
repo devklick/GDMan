@@ -324,6 +324,20 @@
       "args": [
         "uninstall", "-v", "4.2.1", "-p", "macos", "-f", "mono",
       ]
+    },
+    {
+      "name": "Uninstall Unused",
+      "type": "lldb",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--bin=gdman", "--package=gdman"],
+        "filter": { "name": "gdman", "kind": "bin" }
+      },
+      /* prettier-ignore */
+      "args": [
+        "uninstall", "--unused",
+      ]
     }
   ]
 }
