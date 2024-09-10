@@ -163,18 +163,6 @@ fn parse_architecture_from_version_name(
     }
 }
 
-pub fn generate_version_name(
-    version: &str,
-    platform: &Platform,
-    architecture: &Architecture,
-    flavour: &Flavour,
-) -> Result<String, String> {
-    match generate_asset_name(platform, architecture, flavour) {
-        Err(e) => Err(e),
-        Ok(asset_name) => Ok(["Godot_v", &version, "_", &asset_name].join("")),
-    }
-}
-
 // Generates the expected name of the Godot download asset.
 // This reverse engineers the naming convention used by Godot.
 // The naming convention is likely to change at some point, so we may

@@ -15,7 +15,7 @@
       },
       /* prettier-ignore */
       "args": [
-        "install", "-l", "-f", "mono"
+        "install", "-v", "4.2.1"
       ]
     },
     // ======== INSTALL ========
