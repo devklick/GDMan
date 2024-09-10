@@ -53,6 +53,6 @@ targets = [
     "x86_64-pc-windows-msvc",
 ]
 # Path that installers should place binaries in
-install-path = "CARGO_HOME"
+install-path = "~/.gdman/"
 # Whether to install an updater program
 install-updater = false
