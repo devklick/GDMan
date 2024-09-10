@@ -150,8 +150,21 @@ pub fn activate_by_parts_if_installed(
     flavour: &Flavour,
 ) -> Result<bool, String> {
     if let Some(v) = version {
-        let version_name = gd::generate_version_name(v, platform, architecture, flavour)?;
-        return activate_by_name_if_installed(&version_name);
+        let installed_versions = get_installed_versions()?;
+        for installed_version in installed_versions {
+            if &installed_version.name_parts.architecture == architecture
+                && &installed_version.name_parts.flavour == flavour
+                && &installed_version.name_parts.platform == platform
+                // name_parts.version excludes the -stable pre-release flag, 
+                // convert it to string and check if it matches the specified version
+                && (installed_version.name_parts.version.to_string() == *v 
+                // Maybe the user has specified the full version including the -stable flag,
+                // so lets also check the version_string (which is the exact version string from the file name)
+                || installed_version.name_parts.version_string == *v)
+            {
+                return activate_by_name_if_installed(&installed_version.name_parts.version_name);
+            }
+        }
     }
     return Ok(false);
 }
