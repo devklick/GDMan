@@ -49,7 +49,7 @@ fn init_logger(verbose: bool) -> Result<(), String> {
         .error(Color::Red)
         .debug(Color::Blue);
 
-    return match fern::Dispatch::new()
+    let mut builder = fern::Dispatch::new()
         .format(move |out, message, record| {
             let level = record.level();
             if level == log::Level::Info {
@@ -59,9 +59,13 @@ fn init_logger(verbose: bool) -> Result<(), String> {
             }
         })
         .level(log_level)
-        .chain(std::io::stdout())
-        .apply()
-    {
+        .chain(std::io::stdout());
+
+    if !cfg!(debug_assertions) {
+        builder = builder.level_for("lnk", log::LevelFilter::Off);
+    }
+
+    return match builder.apply() {
         Err(e) => Err(e.to_string()),
         Ok(_) => Ok(()),
     };

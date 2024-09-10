@@ -1,10 +1,3 @@
-use crate::{
-    common::{Architecture, Flavour, Platform},
-    github::godot_repo::{self as gd, parse_version_name, GodotVersionNameParts},
-};
-
-use indicatif::{ProgressBar, ProgressStyle};
-use reqwest::{header, Url};
 use std::{
     env,
     fs::{self, remove_file, DirEntry},
@@ -12,16 +5,23 @@ use std::{
 };
 
 use async_zip::tokio::read::seek::ZipFileReader;
+use indicatif::{ProgressBar, ProgressStyle};
+use reqwest::{header, Url};
 use tokio::{
     fs::{create_dir_all, File, OpenOptions},
     io::{AsyncWriteExt, BufReader},
 };
 use tokio_util::compat::{TokioAsyncReadCompatExt, TokioAsyncWriteCompatExt};
 
+use crate::{
+    common::{Architecture, Flavour, Platform},
+    github::godot_repo::{self as gd, parse_version_name, GodotVersionNameParts},
+};
+
 pub fn set_active_godot_version(version_name: &str) -> Result<(), String> {
     log::trace!("Setting active Godot version to {version_name}");
 
-    let link_path: PathBuf = get_godot_link_path()?;
+    let link_path = get_godot_link_path()?;
 
     remove_link(&link_path)?;
 
@@ -30,8 +30,8 @@ pub fn set_active_godot_version(version_name: &str) -> Result<(), String> {
 
     if !target_version_dir.is_dir() {
         return Err(format!(
-            "Version directory {:#?} does not exist",
-            target_version_dir
+            "Version directory {} does not exist",
+            target_version_dir.display()
         ));
     }
 
@@ -44,82 +44,6 @@ pub fn set_active_godot_version(version_name: &str) -> Result<(), String> {
     log::info!("Set {version_name} active");
 
     return Ok(());
-}
-
-#[cfg(windows)]
-fn create_link(link_path: &PathBuf, target_path: &PathBuf) -> Result<(), String> {
-    let sl = mslnk::ShellLink::new(target_path).or(Err("Failed to create ShellLink"))?;
-    sl.create_lnk(link_path)
-        .or(Err("Failed to create Godot shortcut"))?;
-
-    return Ok(());
-}
-
-#[cfg(unix)]
-fn create_link(link_path: &PathBuf, target_path: &PathBuf) -> Result<(), String> {
-    if let Err(err) = symlink::symlink_file(target_path, link_path) {
-        return Err(format!(
-            "Failed to create Godot symlink,\n{}",
-            err.to_string()
-        ));
-    }
-    return Ok(());
-}
-
-#[cfg(windows)]
-fn remove_link(link_path: &PathBuf) -> Result<(), String> {
-    if link_path.is_file() {
-        log::trace!("Removing old godot link {}", link_path.display());
-        fs::remove_file(link_path).or(Err("Error deleting Windows Godot shortcut"))?;
-    }
-    return Ok(());
-}
-
-#[cfg(unix)]
-fn remove_link(link_path: &PathBuf) -> Result<(), String> {
-    match fs::symlink_metadata(&link_path) {
-        Ok(_) => {
-            log::trace!("Removing old godot link {}", link_path.display());
-            if let Err(e) = fs::remove_file(&link_path) {
-                return Err(e.to_string().to_owned());
-            }
-        }
-        Err(_) => {}
-    }
-    return Ok(());
-}
-
-#[cfg(unix)]
-fn get_link_target(link_path: &PathBuf) -> Result<PathBuf, String> {
-    return match fs::read_link(link_path) {
-        Err(e) => Err(format!(
-            "Cant determine current version, godot link may be broken\n{e}"
-        )),
-        Ok(target) => {
-            log::trace!("Godot link points to {}", target.display());
-            return Ok(target);
-        }
-    };
-}
-
-#[cfg(windows)]
-fn get_link_target(link_path: &PathBuf) -> Result<PathBuf, String> {
-    let target = lnk::ShellLink::open(link_path).unwrap();
-    log::trace!("Found lnk data {:#?}", target);
-
-    let working_dir = target
-        .working_dir()
-        .as_ref()
-        .expect("Godot shortcut has no working directory");
-
-    let relative_path = target
-        .relative_path()
-        .as_ref()
-        .expect("Godot shortcut has no relative path");
-
-    let target_path = PathBuf::from_iter([working_dir, relative_path]);
-
-    return Ok(target_path);
 }
 
 pub fn already_installed(version_name: &str) -> bool {
@@ -169,31 +93,6 @@ pub fn get_base_dir() -> Result<PathBuf, String> {
     }
 }
 
-fn get_godot_exe_path(dir_path: &PathBuf) -> Result<PathBuf, String> {
-    // The executable is in a different location depending on which platform the version belongs to.
-    // Parse the version name to extract the platform from it.
-    let name_parts = parse_version_name(dir_path.file_name().unwrap().to_str().unwrap())?;
-
-    log::trace!("Finding executable file in {}", dir_path.display());
-
-    let exe_path = match name_parts.platform {
-        Platform::Linux => get_godot_exe_path_linux(dir_path),
-        Platform::Windows => get_godot_exe_path_windows(dir_path),
-        Platform::MacOS => get_godot_exe_path_macos(dir_path),
-    }?;
-
-    if let Some(exe_path) = exe_path {
-        // A previous download may have been cancelled, and we may have accidentally
-        // identify the leftover zip file as being the executable. If so, ignore it
-        if !exe_path.ends_with(".zip") {
-            log::trace!("Found godot executable {}", exe_path.display());
-            return Ok(exe_path);
-        }
-    }
-
-    return Err("Cant find Godot executable".to_owned());
-}
-
 pub async fn download_godot_version(
     version_name: &str,
     client: &reqwest::Client,
@@ -227,48 +126,12 @@ pub async fn download_godot_version(
 
     unzip_file(file, &version_dir_path).await?;
 
-    cleanup_version_dir(&version_dir_path)?;
-
-    // make executable
-
     log::trace!("Deleting zip file {}", &version_zip_path.display());
     if let Err(e) = remove_file(&version_zip_path) {
         return Err(e.to_string());
     }
 
     return Ok(version_dir_path);
-}
-
-/// In some cases, the contents of the zip have a folder with the same name,
-/// then the main contents nested within that, so when extracted we end up
-/// having to folders with the same name, eg:`some-name/some-name/file1`.
-///
-/// We dont want this, we want the main files to be at the top level of the folder
-fn cleanup_version_dir(path: &PathBuf) -> Result<(), String> {
-    let name = path.file_name().unwrap();
-    let parent_dir = path.parent().unwrap();
-    let double_folder_path = parent_dir.join(name).join(name);
-
-    if double_folder_path.is_dir() {
-        let index = double_folder_path
-            .to_string_lossy()
-            .rfind(name.to_str().unwrap())
-            .unwrap();
-
-        for entry in fs::read_dir(&double_folder_path).unwrap() {
-            let entry = entry.unwrap();
-            let new_path = entry
-                .path()
-                .to_string_lossy()
-                .replace(&double_folder_path.to_string_lossy()[..index], "");
-
-            fs::rename(entry.path(), new_path).unwrap();
-        }
-
-        fs::remove_dir_all(double_folder_path).unwrap();
-    }
-
-    return Ok(());
 }
 
 /**
@@ -382,6 +245,82 @@ pub fn get_current_version() -> Result<GodotVersionInfo, String> {
     return Ok(current_info);
 }
 
+#[cfg(windows)]
+fn create_link(link_path: &PathBuf, target_path: &PathBuf) -> Result<(), String> {
+    let sl = mslnk::ShellLink::new(target_path).or(Err("Failed to create ShellLink"))?;
+    sl.create_lnk(link_path)
+        .or(Err("Failed to create Godot shortcut"))?;
+
+    return Ok(());
+}
+
+#[cfg(unix)]
+fn create_link(link_path: &PathBuf, target_path: &PathBuf) -> Result<(), String> {
+    if let Err(err) = symlink::symlink_file(target_path, link_path) {
+        return Err(format!(
+            "Failed to create Godot symlink,\n{}",
+            err.to_string()
+        ));
+    }
+    return Ok(());
+}
+
+#[cfg(windows)]
+fn remove_link(link_path: &PathBuf) -> Result<(), String> {
+    if link_path.is_file() {
+        log::trace!("Removing old godot link {}", link_path.display());
+        fs::remove_file(link_path).or(Err("Error deleting Windows Godot shortcut"))?;
+    }
+    return Ok(());
+}
+
+#[cfg(unix)]
+fn remove_link(link_path: &PathBuf) -> Result<(), String> {
+    match fs::symlink_metadata(&link_path) {
+        Ok(_) => {
+            log::trace!("Removing old godot link {}", link_path.display());
+            if let Err(e) = fs::remove_file(&link_path) {
+                return Err(e.to_string().to_owned());
+            }
+        }
+        Err(_) => {}
+    }
+    return Ok(());
+}
+
+#[cfg(unix)]
+fn get_link_target(link_path: &PathBuf) -> Result<PathBuf, String> {
+    return match fs::read_link(link_path) {
+        Err(e) => Err(format!(
+            "Cant determine current version, godot link may be broken\n{e}"
+        )),
+        Ok(target) => {
+            log::trace!("Godot link points to {}", target.display());
+            return Ok(target);
+        }
+    };
+}
+
+#[cfg(windows)]
+fn get_link_target(link_path: &PathBuf) -> Result<PathBuf, String> {
+    let target = lnk::ShellLink::open(link_path).unwrap();
+    log::trace!("Found lnk data {:#?}", target);
+
+    let working_dir = target
+        .working_dir()
+        .as_ref()
+        .expect("Godot shortcut has no working directory");
+
+    let relative_path = target
+        .relative_path()
+        .as_ref()
+        .expect("Godot shortcut has no relative path");
+
+    let target_path = PathBuf::from_iter([working_dir, relative_path]);
+
+    return Ok(target_path);
+}
+
 #[cfg(any(windows, target_os = "linux"))]
 fn get_version_dir_from_exe_path(exe_path: &PathBuf) -> Result<PathBuf, String> {
     return Ok(exe_path.parent().unwrap().to_path_buf());
@@ -409,30 +348,39 @@ fn get_godot_link_path() -> Result<PathBuf, String> {
 
 /// On linux, the Godot executable is expected to be the only file within the version directory.
 /// If exactly one file is found, it's path will be returned. Otherwise an error will be returned.
-fn get_godot_exe_path_linux(dir_path: &PathBuf) -> Result<Option<PathBuf>, String> {
+#[cfg(target_os = "linux")]
+fn get_godot_exe_path(dir_path: &PathBuf) -> Result<PathBuf, String> {
     let files = get_files(dir_path)?;
 
     if files.len() == 1 {
-        return Ok(Some(files.first().unwrap().path()));
+        let exe_path = files.first().unwrap().path();
+        if !exe_path.ends_with(".zip") {
+            return Ok(exe_path);
+        }
     }
-    return Ok(None);
+    return Err("Cant find Godot executable".to_owned());
 }
 
 /// On Windows, the Godot executable is expected to match the directory name.
 /// If this is found, it's path will be returned. Otherwise an error will be returned.
-fn get_godot_exe_path_windows(dir_path: &PathBuf) -> Result<Option<PathBuf>, String> {
+#[cfg(windows)]
+fn get_godot_exe_path(dir_path: &PathBuf) -> Result<PathBuf, String> {
     let dir_name = dir_path.file_name().unwrap();
     for file in get_files(dir_path)? {
         if file.file_name() == dir_name || file.path().file_stem().unwrap() == dir_name {
-            return Ok(Some(file.path()));
+            let exe_path = file.path();
+            if !exe_path.ends_with(".zip") {
+                return Ok(exe_path);
+            }
         }
     }
-    return Ok(None);
+    return Err("Cant find Godot executable".to_owned());
 }
 
 /// On MacOS, the executable is expected to be in a consistent, exact location.
 /// If this is found, it will be returned, otherwise an error will be returned.
-fn get_godot_exe_path_macos(dir_path: &PathBuf) -> Result<Option<PathBuf>, String> {
+#[cfg(target_os = "macos")]
+fn get_godot_exe_path(dir_path: &PathBuf) -> Result<PathBuf, String> {
     // there should be one folder within dir_path.
     // It name depends on the flavour - we dont care which it is, we just need to find it
     let entries = fs::read_dir(dir_path)
@@ -441,8 +389,9 @@ fn get_godot_exe_path_macos(dir_path: &PathBuf) -> Result<Option<PathBuf>, Strin
         .flatten()
         .collect::<Vec<DirEntry>>();
 
+    let err = Err("Cant find Godot executable".to_owned());
     if entries.len() != 1 {
-        return Ok(None);
+        return err;
     }
 
     let path = dir_path
@@ -450,8 +399,8 @@ fn get_godot_exe_path_macos(dir_path: &PathBuf) -> Result<Option<PathBuf>, Strin
         .join("Contents/MacOS/Godot");
 
     return match path.is_file() {
-        true => Ok(Some(path)),
-        false => Ok(None),
+        true => Ok(path),
+        false => err,
     };
 }
 
@@ -629,6 +578,7 @@ async fn unzip_file(file: tokio::fs::File, out_dir: &Path) -> Result<(), String>
             let writer = OpenOptions::new()
                 .write(true)
                 .create_new(true)
+                .mode(755)
                 .open(&path)
                 .await
                 .expect("Failed to create extracted file");
