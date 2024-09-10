@@ -575,10 +575,14 @@ async fn unzip_file(file: tokio::fs::File, out_dir: &Path) -> Result<(), String>
             }
 
             log::trace!("Creating writer for zip entry {index}");
-            let writer = OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .mode(755)
+            let mut file_opts = OpenOptions::new();
+            file_opts.write(true).create_new(true);
+
+            if cfg!(unix) {
+                file_opts.mode(755);
+            }
+
+            let writer = file_opts
                 .open(&path)
                 .await
                 .expect("Failed to create extracted file");
