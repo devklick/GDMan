@@ -26,7 +26,7 @@ Things to note:
 - After running `gdman install`, you'll have a `godot` symlink that you can invoke from the terminal to launch the currently-active version of godot (note that this will be godot.lnk on Windows).
 - All versions of Godot installed via gdman will be in `~/.gdman/versions`
 
-It can also be installed via [Cargo](https://crates.io/crates/.gdman).
+It can also be installed via [Cargo](https://crates.io/crates/gdman).
 
 ### Updating gdman
 
