@@ -33,6 +33,13 @@ struct UpdateType {
 pub struct UpdateVersionCommand {
     #[command(flatten)]
     update_type: UpdateType,
+
+    #[arg(
+        long,
+        help = "Uninstall the current version after installing the updated version",
+        default_value_t = false
+    )]
+    uninstall: bool,
 }
 
 impl RunCommand for UpdateVersionCommand {
@@ -87,12 +94,19 @@ impl RunCommand for UpdateVersionCommand {
         let version_name = asset.name.trim_end_matches(".zip");
 
         if gdman::activate_by_name_if_installed(version_name)? {
+            if self.uninstall {
+                gdman::uninstall_version(&current)?;
+            }
             return Ok(());
         }
 
         gdman::download_godot_version(version_name, &client, &asset.browser_download_url).await?;
 
         gdman::set_active_godot_version(version_name)?;
+
+        if self.uninstall {
+            gdman::uninstall_version(&current)?;
+        }
 
         return Ok(());
     }

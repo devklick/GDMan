@@ -134,6 +134,16 @@ pub async fn download_godot_version(
     return Ok(version_dir_path);
 }
 
+pub fn uninstall_version(version: &GodotVersionInfo) -> Result<(), String> {
+    log::trace!("Uninstalling version {}", version.name_parts.version);
+    if let Err(err) = fs::remove_dir_all(version.path.parent().unwrap()) {
+        return Err(format!(
+            "Error uninstalling version {}\n{}",
+            version.name_parts.version_name, err
+        ));
+    }
+    Ok(())
+}
 /**
  * Checks if an exact version was specified, and if so, checks if it's already
  * installed on the system. If it's found to already be installed, that version

@@ -78,7 +78,7 @@ To conveniently update the version of Godot that you currently have set active o
 - `--minor` - To update to the latest minor revision of the current version. E.g. if you're on v1.2.3, v1.3.4 and v2 are available, this will update you to v1.3.4.
 - `--major` - To update to the latest version of the current version. E.g. if you're on v1.2.3, v1.3.4 and v2.1.0 are available, this will update you to v2.1.0.
 
-**Note** that the `gdman update` command will install and set active the relevant version of Godot. It does not remove the version that's installed at the time of running the command.
+If you want to remove the old version, you can pass in the `--uninstall` flag. This will uninstall the old version once the new version has been installed and activated.
 
 For more info, run `gdman update --help`.
 
