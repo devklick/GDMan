@@ -1,4 +1,4 @@
-use std::{fs, str::FromStr};
+use std::str::FromStr;
 
 use clap::Parser;
 
@@ -103,12 +103,7 @@ impl RunCommand for UninstallVersionsCommand {
                     version.name_parts.version_name
                 ));
             } else {
-                if let Err(err) = fs::remove_dir_all(version.path) {
-                    return Err(format!(
-                        "Error uninstalling version {}\n{}",
-                        version.name_parts.version_name, err
-                    ));
-                }
+                gdman::uninstall_version(&version)?;
                 log::info!("Uninstalled version {}", version.name_parts.version_name);
             }
         }
