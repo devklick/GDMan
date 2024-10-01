@@ -15,7 +15,7 @@ futures-lite = "2.3.0"
 indicatif = "0.17.8"
 log = "0.4.22"
 regex = "1.10.6"
-reqwest = { version = "0.12.7", features = ["json"] }
+reqwest = { version = "0.12.8", features = ["json"] }
 semver = "1.0.23"
 serde = { version = "1.0.210", features = ["derive"] }
 stderrlog = "0.6.0"
