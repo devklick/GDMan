@@ -1,6 +1,6 @@
 [package]
 name = "gdman"
-version = "0.0.18"
+version = "0.0.19"
 edition = "2021"
 repository = "https://github.com/devklick/gdman-rs"
 description = "A CLI application for managing versions of Godot"
