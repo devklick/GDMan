@@ -22,7 +22,7 @@ stderrlog = "0.6.0"
 strum = "0.26.3"
 strum_macros = "0.26.4"
 tokio = { version = "1.40.0", features = ["fs", "macros", "rt-multi-thread"] }
-tokio-util = "0.7.12"
+tokio-util = "0.7.13"
 
 [target.'cfg(windows)'.dependencies]
 mslnk = "0.1.8"
