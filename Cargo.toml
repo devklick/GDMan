@@ -10,7 +10,7 @@ license = "MIT"
 async_zip = { version = "0.0.17", features = ["deflate", "tokio", "tokio-fs"] }
 chrono = { version = "0.4.38", features = ["serde"] }
 clap = { version = "4.5.19", features = ["derive"] }
-fern = { version = "0.6.2", features = ["colored"] }
+fern = { version = "0.7.1", features = ["colored"] }
 futures-lite = "2.3.0"
 indicatif = "0.17.8"
 log = "0.4.22"
